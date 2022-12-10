@@ -1,11 +1,30 @@
 cmake_minimum_required(VERSION 3.10)
 cmake_policy(SET CMP0076 NEW)
 
+set(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION.txt" WDAS_PRODUCT_VERSION)
+
 project(raven VERSION 1.0)
 
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 
-add_executable(raven)
+if(APPLE)
+    set(APP_BUNDLE_IDENTIFIER "com.opentimelineio.raven")
+    set(MACOSX_BUNDLE_BUNDLE_NAME "raven")
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${WDAS_PRODUCT_VERSION})
+    set(MACOSX_BUNDLE_INFO_STRING ${APP_BUNDLE_IDENTIFIER})
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER ${APP_BUNDLE_IDENTIFIER})
+
+    set(MACOSX_BUNDLE_ICON_FILE "appicon.icns")
+    set(RAVEN_ICON ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
+    set_source_files_properties(${RAVEN_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    add_executable(raven MACOSX_BUNDLE ${RAVEN_ICON})
+    set_target_properties(raven PROPERTIES
+        OUTPUT_NAME "Raven OTIO Viewer"
+    )
+else()
+    add_executable(raven)
+endif()
 set_property(TARGET raven PROPERTY CXX_STANDARD 14)
 
 target_sources(raven
