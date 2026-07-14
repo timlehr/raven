@@ -13,7 +13,7 @@
 
 #include "widgets.h"
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 #include "nfd.h"
 #endif
 
@@ -707,13 +707,13 @@ void MainGui() {
     auto viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->Pos);
     ImGui::SetNextWindowSize(viewport->Size);
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
     ImGui::GetPlatformIO().Platform_SetWindowTitle(viewport, window_title);
 #endif
 
     ImGui::Begin(
         window_id,
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
         &appState.show_main_window,
 #else
         NULL,
@@ -721,7 +721,7 @@ void MainGui() {
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoResize |
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
         // With Emscripten, we show the Dear ImGui titlebar,
         // but on desktop, the outer platform window has a titlebar already
         ImGuiWindowFlags_NoTitleBar |
@@ -967,7 +967,7 @@ void SaveTheme() {
 }
 
 std::string OpenFileDialog() {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     return "";
 #else
     nfdchar_t* outPath = NULL;
@@ -986,7 +986,7 @@ std::string OpenFileDialog() {
 }
 
 std::string SaveFileDialog() {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     return "";
 #else
     nfdchar_t* outPath = NULL;
@@ -1025,7 +1025,7 @@ void DrawMenu() {
             if (ImGui::MenuItem("Close Tab", NULL, false, GetActiveRoot())) {
                 CloseTab(appState.active_tab);
             }
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
             // You can't exit(0) from a web page
             // but you can on Desktop platforms.
             if (ImGui::MenuItem("Exit", "Alt+F4")) {

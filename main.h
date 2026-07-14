@@ -4,7 +4,7 @@ void MainGui();
 void MainCleanup();
 void FileDropCallback(int count, const char** paths);
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 extern "C" {
 void js_LoadUrl(char* url);
 void js_LoadString(char* json);
