@@ -34,14 +34,41 @@ raven = "otio_raven._wrapper:main"
 "Bug Tracker" = "https://github.com/OpenTimelineIO/raven/issues"
 
 [tool.scikit-build]
-cmake.version = ">=3.10"
+# arm64/universal2 builds want >=3.19.2
+cmake.version = ">=3.19.2"
 cmake.build-type = "Release"
 wheel.packages = ["python/otio_raven"]
 wheel.install-dir = "otio_raven"
 wheel.py-api = "py3"
 
-[tool.scikit-build.metadata.version]
+[[tool.dynamic-metadata]]
+field = "version"
 provider = "scikit_build_core.metadata.regex"
 input = "VERSION.txt"
-regex = "^(?P<version>.+)"
-result = "{version}"
+regex = "^(?P<value>.+)"
+result = "{value}"
+
+[tool.cibuildwheel]
+# raven ships no per-Python code (just the compiled binary + a py wrapper), and
+# wheel.py-api="py3" tags every wheel py3-none-<platform>. So build once per
+# platform on a single interpreter, not once per CPython version.
+build = "cp39-*"
+skip = "*-musllinux*"
+test-command = "raven --version"
+
+[tool.cibuildwheel.linux]
+# glfw is built from the submodule (needs X11 dev headers).
+# nativefiledialog needs GTK3.
+# zlib is fetched by minizip-ng itself.
+before-all = "dnf install -y libX11-devel libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel mesa-libGL-devel gtk3-devel"
+# Skip Wayland backend to avoid pulling the wayland/libdecor dep chain.
+environment = { CMAKE_ARGS = "-DGLFW_BUILD_WAYLAND=OFF" }
+
+[tool.cibuildwheel.macos]
+# CMakeLists forces CMAKE_OSX_ARCHITECTURES=arm64;x86_64
+# tag the wheel to match unversal build.
+archs = ["universal2"]
+
+[tool.cibuildwheel.windows]
+before-all = "vcpkg install zlib:x64-windows"
+environment = { CMAKE_PREFIX_PATH = "C:/vcpkg/installed/x64-windows" }
