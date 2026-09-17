@@ -139,3 +139,13 @@ endif()
 install(TARGETS raven
     BUNDLE DESTINATION bin
     RUNTIME DESTINATION bin)
+
+# Bundle vcpkg's zlib DLL (z.dll) next to raven.exe so the packaged wheel/archive
+# runs standalone. $<TARGET_RUNTIME_DLLS> misses it because zlib is pulled in
+# transitively through the static minizip library, and delvewheel only scans .pyd.
+# cibuildwheel passes the vcpkg prefix via the CMAKE_PREFIX_PATH env var.
+if(WIN32 AND DEFINED ENV{CMAKE_PREFIX_PATH})
+  install(DIRECTORY "$ENV{CMAKE_PREFIX_PATH}/bin/"
+          DESTINATION bin
+          FILES_MATCHING PATTERN "*.dll")
+endif()
