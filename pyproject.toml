@@ -54,7 +54,7 @@ result = "{value}"
 # platform on a single interpreter, not once per CPython version.
 build = "cp39-*"
 skip = "*-musllinux*"
-test-command = "raven --version"
+test-command = "python {project}/scripts/ci_smoketest.py"
 
 [tool.cibuildwheel.linux]
 # glfw is built from the submodule (needs X11 dev headers).
